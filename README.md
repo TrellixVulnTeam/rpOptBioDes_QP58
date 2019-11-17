@@ -1,6 +1,6 @@
-# Galaxy rpCofactors
+# Galaxy rpOptBioDes
 
-Galaxy tool that reads the output of RP2paths (link to the project), parses it, and adds the missing cofactors from mono-component reactions compared with the original reactions from wich the reaction rule is generated from. The output of the tool is a tar.xz file with each generated pathways (and sub-pathways) generated into an individual SBML files. 
+Galaxy RP implementation of the OptBioDes tool by Pablo Carbonell
 
 ## Getting Started
 
@@ -17,7 +17,7 @@ Create a new section in the Galaxy tool_conf.xml from the config file:
 
 ```
 <section id="retro" name="Retro Nodes">
-  <tool file="/local/path/wrap_rpCofactors.xml" />
+  <tool file="/local/path/wrap_rpOptBioDes.xml" />
 </section>
 ```
 
@@ -32,7 +32,7 @@ sudo service docker restart
 Build the docker image:
 
 ```
-docker build -t brsynth/rp2reader .
+docker build -t brsynth/rpoptbiodes .
 ```
 
 Make sure that the following entry exists under Galaxy's destination tag in job_conf.xml:
@@ -49,7 +49,7 @@ Make sure that the following entry exists under Galaxy's destination tag in job_
 And that the destination of the tool is refered under the tools tag of job_conf.xml:
 
 ```
-    <tool id="rpCofactors" destination="docker_local" />
+    <tool id="rpOptBioDes" destination="docker_local" />
 ```
 
 Finally, make sure that you give the python scripts execution permission:
