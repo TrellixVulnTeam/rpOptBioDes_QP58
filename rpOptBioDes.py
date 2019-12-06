@@ -3,18 +3,24 @@
 import sys
 sys.path.insert(0, '/home/')
 
+import tempfile
+import shutil
 import argparse
 import libsbml
 import tarfile
 import logging
-import tempfile
 import os
 import re
-import requests
 import csv
 import pandas as pd
 import glob
 from doebase.synbioParts import doeGetSBOL
+
+try:
+    import lzma
+except ImportError:
+    from backports import lzma
+
 
 #TODO: consider replacing this function with directly rpSBML functions from an import 
 
@@ -94,57 +100,61 @@ def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, l
         - maxgenes: maximum number of genes selected per step
         - file_parts: file with a URI list of sbol parts in Synbiohub
     """
-    #rpcofactors = rpCofactors.rpCofactors()
-    with tempfile.TemporaryDirectory() as tmpOutputFolder:
-        with tempfile.TemporaryDirectory() as tmpInputFolder:
-            tar = tarfile.open(inputTar, 'r:xz')
-            tar.extractall(path=tmpInputFolder)
-            tar.close()
-            for sbml_path in glob.glob(tmpInputFolder+'/*'):
-                fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '')
-                selenzyme_info = readRPpathway_selenzyme(libsbml.readSBMLFromFile(sbml_path), pathway_id)
-                ##### PABLO ####
-                # Prepare input files: geneparts.csv, refparts.csv
-                genes = selenzinfo2table(selenzyme_info,maxgenes)
-                gene_parts = os.path.join(tmpOutputFolder, 'GeneParts.csv')
-                genes.to_csv(gene_parts, index=False)
-                if file_parts is None:
-                    refs = refparts_default()
-                    ref_parts = os.path.join(tmpOutputFolder, 'RefParts.csv')
-                    refs.to_csv(ref_parts,index=False)
-                # Run DoE and retrieve SBOL and diagnostics
-                diagnostics = doeGetSBOL(ref_parts, gene_parts, libsize)
-                #diagnostics = doeGetSBOL(ref_parts, gene_parts, size)
-                '''
-                data = {'M': diagnostics['M'].tolist(),
-                        'J': diagnostics['J'],
-                        'pow': diagnostics['J'],
-                        'rpv': diagnostics['J'],
-                        'names': diagnostics['names'],
-                        'libsize': diagnostics['libsize'],
-                        'seed': diagnostics['seed'],
-                        'sbol': diagnostics['sbol']}
-                '''
-                #print(diagnostics)
-                #print(diagnostics.keys())
-                #dict_keys(['J', 'pow', 'rpv', 'X', 'M', 'factors', 'fact', 'M1', 'df', 'names', 'seed', 'libsize', 'sbol'])
-                # Store results
-                #open(outSBOL, 'w').write(res['data']['sbol'])
-                open(tmpOutputFolder+'/'+fileName, 'w').write(diagnostics['sbol'])
-                #TODO: need to include the efeciecy information inside the SBOL directly
-                '''
-                with open(tmpOutputFolder+'_info.txt', 'w') as text_file:
-                    text_file.write('Size: '+str(diagnostics['libsize'])+'\n')
-                    text_file.write('Efficiency:'+str(diagnostics['J'])+'\n')
-                '''
-                #Here you can insert what you need to do, or build a larger dictionnary for all the pathways. FileName 
-                #is the name of the pathway ex: rp_1_1
-                #NOTE: this is retro so the first reaction is RP{highest} and the last reaction in the pathway is RP{lowest}
-                # the dictionnary should be like the following:
-                ################
-            with tarfile.open(outputTar, mode='w:xz') as ot:
-                for sbol_path in glob.glob(tmpOutputFolder+'/*'):
-                    outFileName = str(sbml_path.split('/')[-1])+'.sbol.xml'
-                    info = tarfile.TarInfo(outFileName)
-                    info.size = os.path.getsize(sbol_path)
-                    ot.addfile(tarinfo=info, fileobj=open(sbol_path, 'rb'))
+    tmpOutputFolder = tempfile.mkdtemp()
+    tmpInputFolder = tempfile.mkdtemp()
+    with lzma.open(inputTar) as f:
+        with tarfile.open(fileobj=f) as tar:
+            tar.extractall(path=tmpOutputFolder)
+    #tar = tarfile.open(inputTar, 'r:xz')
+    #tar.extractall(path=tmpInputFolder)
+    #tar.close()
+    for sbml_path in glob.glob(tmpInputFolder+'/*'):
+        fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '')
+        selenzyme_info = readRPpathway_selenzyme(libsbml.readSBMLFromFile(sbml_path), pathway_id)
+        ##### PABLO ####
+        # Prepare input files: geneparts.csv, refparts.csv
+        genes = selenzinfo2table(selenzyme_info,maxgenes)
+        gene_parts = os.path.join(tmpOutputFolder, 'GeneParts.csv')
+        genes.to_csv(gene_parts, index=False)
+        if file_parts is None:
+            refs = refparts_default()
+            ref_parts = os.path.join(tmpOutputFolder, 'RefParts.csv')
+            refs.to_csv(ref_parts,index=False)
+        # Run DoE and retrieve SBOL and diagnostics
+        diagnostics = doeGetSBOL(ref_parts, gene_parts, libsize)
+        #diagnostics = doeGetSBOL(ref_parts, gene_parts, size)
+        '''
+        data = {'M': diagnostics['M'].tolist(),
+                'J': diagnostics['J'],
+                'pow': diagnostics['J'],
+                'rpv': diagnostics['J'],
+                'names': diagnostics['names'],
+                'libsize': diagnostics['libsize'],
+                'seed': diagnostics['seed'],
+                'sbol': diagnostics['sbol']}
+        '''
+        #print(diagnostics)
+        #print(diagnostics.keys())
+        #dict_keys(['J', 'pow', 'rpv', 'X', 'M', 'factors', 'fact', 'M1', 'df', 'names', 'seed', 'libsize', 'sbol'])
+        # Store results
+        #open(outSBOL, 'w').write(res['data']['sbol'])
+        open(tmpOutputFolder+'/'+fileName, 'w').write(diagnostics['sbol'])
+        #TODO: need to include the efeciecy information inside the SBOL directly
+        '''
+        with open(tmpOutputFolder+'_info.txt', 'w') as text_file:
+            text_file.write('Size: '+str(diagnostics['libsize'])+'\n')
+            text_file.write('Efficiency:'+str(diagnostics['J'])+'\n')
+        '''
+        #Here you can insert what you need to do, or build a larger dictionnary for all the pathways. FileName 
+        #is the name of the pathway ex: rp_1_1
+        #NOTE: this is retro so the first reaction is RP{highest} and the last reaction in the pathway is RP{lowest}
+        # the dictionnary should be like the following:
+        ################
+    with tarfile.open(outputTar, mode='w:gz') as ot:
+        for sbol_path in glob.glob(tmpOutputFolder+'/*'):
+            outFileName = str(sbml_path.split('/')[-1])+'.sbol.xml'
+            info = tarfile.TarInfo(outFileName)
+            info.size = os.path.getsize(sbol_path)
+            ot.addfile(tarinfo=info, fileobj=open(sbol_path, 'rb'))
+    shutil.rmtree(tmpOutputFolder)
+    shutil.rmtree(tmpInputFolder)
