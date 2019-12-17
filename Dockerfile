@@ -6,7 +6,7 @@ RUN conda install -y -c anaconda numpy
 RUN conda install -y -c anaconda scipy
 #RUN conda install -y -c sys-bio pysbol2
 
-RUN apt-get update && apt-get install -y git
+#RUN apt-get update && apt-get install -y git
 RUN pip install pysbol numpy pandas scipy python-libsbml
 
 RUN conda install -c conda-forge backports.tempfile
