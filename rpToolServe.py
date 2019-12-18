@@ -41,10 +41,13 @@ def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, l
         fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '')
         print('------------ '+str(fileName)+' ------------')
         selenzyme_info = rpTool.readRPpathway_selenzyme(libsbml.readSBMLFromFile(sbml_path), pathway_id)
+        print(selenzyme_info)
         ##### PABLO ####
         # Prepare input files: geneparts.csv, refparts.csv
         genes = rpTool.selenzinfo2table(selenzyme_info, maxgenes)
+        print(genes)
         gene_parts = os.path.join(tmpOutputFolder, 'GeneParts.csv')
+        print(gene_parts)
         genes.to_csv(gene_parts, index=False)
         if file_parts is None:
             refs = rpTool.refparts_default()
