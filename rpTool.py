@@ -1,7 +1,3 @@
-'''
-#!/usr/bin/python2.7
-'''
-
 import sys
 sys.path.insert(0, '/home/')
 

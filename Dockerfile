@@ -1,12 +1,12 @@
-#FROM brsynth/rpbase
-FROM conda/miniconda2
+FROM brsynth/rpbase
+#FROM conda/miniconda2
 
 RUN conda install -y -c anaconda pandas
 RUN conda install -y -c anaconda numpy
 RUN conda install -y -c anaconda scipy
 #RUN conda install -y -c sys-bio pysbol2
 
-RUN pip install pysbol numpy pandas scipy python-libsbml sklearn
+RUN pip install pysbol python-libsbml sklearn
 
 RUN apt-get update && apt-get install -y git
 #RUN conda install -c conda-forge backports.tempfile
@@ -28,8 +28,6 @@ RUN apt-get update && apt-get install -y git
 #RUN apt-get install -y liblzma-dev
 #RUN pip install pylzma
 #RUN pip install backports.lzma
-
-WORKDIR /home/
 
 RUN git clone https://github.com/pablocarb/doebase.git
 
