@@ -9,6 +9,11 @@ import libsbml
 #import subprocess
 import os
 
+import json
+from datetime import datetime
+from flask import Flask, request, jsonify, send_file, abort
+from flask_restful import Resource, Api
+
 import rpTool
 
 ## run using HDD 3X less than the above function
@@ -76,8 +81,67 @@ def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, l
                         outFileName = fileName+'.sbol.xml'
                         info = tarfile.TarInfo(outFileName)
                         info.size = os.path.getsize(sbol_path)
-                        ot.addfile(tarinfo=info, fileobj=open(sbol_path, 'rb')) 
+                        ot.addfile(tarinfo=info, fileobj=open(sbol_path, 'rb'))
                     for parts_path in glob.glob(tmpPartsFolder+'/*'):
                         info = tarfile.TarInfo(parts_path.split('/')[-1])
                         info.size = os.path.getsize(parts_path)
-                        ot.addfile(tarinfo=info, fileobj=open(parts_path, 'rb')) 
+                        ot.addfile(tarinfo=info, fileobj=open(parts_path, 'rb'))
+
+
+#######################################################
+############## REST ###################################
+#######################################################
+
+
+app = Flask(__name__)
+api = Api(app)
+
+
+def stamp(data, status=1):
+    appinfo = {'app': 'rpOptBioDes', 'version': '1.0',
+               'author': 'Melchior du Lac',
+               'organization': 'BRS',
+               'time': datetime.now().isoformat(),
+               'status': status}
+    out = appinfo.copy()
+    out['data'] = data
+    return out
+
+
+class RestApp(Resource):
+    """ REST App."""
+    def post(self):
+        return jsonify(stamp(None))
+    def get(self):
+        return jsonify(stamp(None))
+
+
+class RestQuery(Resource):
+    """ REST interface that generates the Design.
+        Avoid returning numpy or pandas object in
+        order to keep the client lighter.
+    """
+    def post(self):
+        inputTar = request.files['inputTar']
+        params = json.load(request.files['data'])
+        #pass the files to the rpReader
+        outputTar = io.BytesIO()
+        #### HDD ####
+        runOptBioDes_hdd(inputTar,
+                         outputTar,
+                         str(params['pathway_id']),
+                         int(params['maxgenes']),
+                         int(params['libsize']),
+                         str(params['file_parts']))
+        ###### IMPORTANT ######
+        outputTar.seek(0)
+        #######################
+        return send_file(outputTar, as_attachment=True, attachment_filename='rpOptBioDes.tar', mimetype='application/x-tar')
+
+
+api.add_resource(RestApp, '/REST')
+api.add_resource(RestQuery, '/REST/Query')
+
+
+if __name__== "__main__":
+    app.run(host="0.0.0.0", port=8888, debug=True, threaded=True)
