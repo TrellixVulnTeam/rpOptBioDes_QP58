@@ -1,8 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-docker run -v ${PWD}/inside_run.sh:/home/inside_run.sh -v ${PWD}/tool_rpOptBioDes.py:/home/tool_rpOptBioDes.py -v ${PWD}/test_input.tar:/home/test_input.tar -v ${PWD}/results/:/home/results/ --rm brsynth/rpoptbiodes /bin/sh /home/inside_run.sh
-
-cp results/test_output.tar .
-
-#docker run -v ${PWD}/inside_run.sh:/home/inside_run.sh -v ${PWD}/tool_rpFBA.py:/home/tool_rpFBA.py -v ${PWD}/test_input.tar:/home/test_input.tar -v ${PWD}/test_inSBML.sbml:/home/test_inSBML.sbml -v ${PWD}/results/:/home/results/ --rm --user root brsynth/rpfba /bin/sh /home/inside_run.sh
-
+docker run -d -p 8888:8888 --name test_rpOptBioDes brsynth/rpoptbiodes
+python tool_rpOptBioDes.py -inputTar test_input.tar -outputTar test_output.tar -pathway_id rp_pathway -maxVariants 45 -libSize 102 -inputParts None -server_url http://0.0.0.0:8888/REST
+docker kill test_rpOptBioDes
+docker rm test_rpOptBioDes
