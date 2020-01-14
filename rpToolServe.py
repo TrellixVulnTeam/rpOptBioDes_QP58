@@ -71,7 +71,7 @@ def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, l
                         text_file.write('Size: '+str(diagnostics['libSize'])+'\n')
                         text_file.write('Efficiency:'+str(diagnostics['J'])+'\n')
                     '''
-                    #Here you can insert what you need to do, or build a larger dictionnary for all the pathways. FileName 
+                    #Here you can insert what you need to do, or build a larger dictionnary for all the pathways. FileName
                     #is the name of the pathway ex: rp_1_1
                     #NOTE: this is retro so the first reaction is RP{highest} and the last reaction in the pathway is RP{lowest}
                     # the dictionnary should be like the following:
@@ -145,4 +145,4 @@ api.add_resource(RestQuery, '/REST/Query')
 
 
 if __name__== "__main__":
-    app.run(host="0.0.0.0", port=8888, debug=True, threaded=True)
+    app.run(host="0.0.0.0", port=8888, debug=False, threaded=True)
