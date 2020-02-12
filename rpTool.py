@@ -8,9 +8,6 @@ from doebase.synbioParts import doeGetSBOL
 
 
 #TODO: consider replacing this function with directly rpSBML functions from an import 
-
-#TODO: consider replacing this function with directly rpSBML functions from an import 
-
 ## Function that reads returns the list of rea
 #
 #

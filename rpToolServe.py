@@ -20,19 +20,19 @@ import rpTool
 ## run using HDD 3X less than the above function
 #
 #
-#def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, libSize=32, inputParts=None):
-def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', maxgenes=5, libSize=32, inputParts=None):
-    """ - libSize: desired size of the combinatorial library,
-        - maxgenes: maximum number of genes selected per step
-        - inputParts: file with a URI list of sbol parts in Synbiohub
+#def runOptBioDes_hdd(input_tar, output_tar, pathway_id='rp_pathway', max_variants=5, lib_size=32, input_parts=None):
+def runOptBioDes_hdd(input_tar, input_sbol, output_tar, pathway_id='rp_pathway', max_variants=5, lib_size=32, input_parts=None):
+    """ - lib_size: desired size of the combinatorial library,
+        - max_variants: maximum number of genes selected per step
+        - input_parts: file with a URI list of sbol parts in Synbiohub
     """
-    if inputParts=='None' or inputParts=='none' or inputParts=='N':
-        inputParts = None
+    if input_parts=='None' or input_parts=='none' or input_parts=='N':
+        input_parts = None
     with tempfile.TemporaryDirectory() as tmpOutputFolder:
         with tempfile.TemporaryDirectory() as tmpInputFolder:
             with tempfile.TemporaryDirectory() as tmpPartsFolder:
-                #tar = tarfile.open(fileobj=inputTar, mode='r')
-                tar = tarfile.open(fileobj=inputTar, mode='r')
+                #tar = tarfile.open(fileobj=input_tar, mode='r')
+                tar = tarfile.open(fileobj=input_tar, mode='r')
                 tar.extractall(path=tmpInputFolder)
                 tar.close()
                 for sbml_path in glob.glob(tmpInputFolder+'/*'):
@@ -40,21 +40,21 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                     selenzyme_info = rpTool.readRPpathway_selenzyme(libsbml.readSBMLFromFile(sbml_path), pathway_id)
                     ##### PABLO ####
                     # Prepare input files: geneparts.csv, refparts.csv
-                    genes = rpTool.selenzinfo2table(selenzyme_info, maxgenes)
+                    genes = rpTool.selenzinfo2table(selenzyme_info, max_variants)
                     gene_parts = os.path.join(tmpPartsFolder, 'GeneParts.csv')
                     genes.to_csv(gene_parts, index=False)
-                    if inputParts is None:
+                    if input_parts is None:
                         refs = rpTool.refparts_default()
                         ref_parts = os.path.join(tmpPartsFolder, 'RefParts.csv')
                         refs.to_csv(ref_parts,index=False)
                     # Run DoE and retrieve SBOL and diagnostics
                     try:
-                        #diagnostics = rpTool.doeGetSBOL(ref_parts, gene_parts, libSize)
-                        diagnostics = rpTool.doeGetSBOL(pfile=ref_parts, gfile=gene_parts, libsize=libsize, gsbol=inputSbol)
+                        #diagnostics = rpTool.doeGetSBOL(ref_parts, gene_parts, lib_size)
+                        diagnostics = rpTool.doeGetSBOL(pfile=ref_parts, gfile=gene_parts, libsize=lib_size, gsbol=input_sbol)
                     except:
                         logging.error('Error detected error in rpTool.doeGetSBOL for '+str(sbml_path))
                         continue
-                    #diagnostics = rpTool.doeGetSBOL(ref_parts, gene_parts, libSize)
+                    #diagnostics = rpTool.doeGetSBOL(ref_parts, gene_parts, lib_size)
                     #diagnostics = doeGetSBOL(ref_parts, gene_parts, size)
                     '''
                     data = {'M': diagnostics['M'].tolist(),
@@ -62,7 +62,7 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                             'pow': diagnostics['J'],
                             'rpv': diagnostics['J'],
                             'names': diagnostics['names'],
-                            'libSize': diagnostics['libSize'],
+                            'lib_size': diagnostics['lib_size'],
                             'seed': diagnostics['seed'],
                             'sbol': diagnostics['sbol']}
                     '''
@@ -70,7 +70,7 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                     #TODO: need to include the efeciecy information inside the SBOL directly
                     '''
                     with open(tmpOutputFolder+'_info.txt', 'w') as text_file:
-                        text_file.write('Size: '+str(diagnostics['libSize'])+'\n')
+                        text_file.write('Size: '+str(diagnostics['lib_size'])+'\n')
                         text_file.write('Efficiency:'+str(diagnostics['J'])+'\n')
                     '''
                     #Here you can insert what you need to do, or build a larger dictionnary for all the pathways. FileName
@@ -78,7 +78,7 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                     #NOTE: this is retro so the first reaction is RP{highest} and the last reaction in the pathway is RP{lowest}
                     # the dictionnary should be like the following:
                     ################
-                with tarfile.open(fileobj=outputTar, mode='w:xz') as ot:
+                with tarfile.open(fileobj=output_tar, mode='w:xz') as ot:
                     for sbol_path in glob.glob(tmpOutputFolder+'/*'):
                         fileName = sbol_path.split('/')[-1].replace('.sbml','').replace('.xml','').replace('.sbol','')
                         outFileName = fileName+'.sbol.xml'
@@ -125,21 +125,23 @@ class RestQuery(Resource):
         order to keep the client lighter.
     """
     def post(self):
-        inputTar = request.files['inputTar']
+        input_tar = request.files['input_tar']
+        input_sbol = request.files['input_sbol']
         params = json.load(request.files['data'])
         #pass the files to the rpReader
-        outputTar = io.BytesIO()
+        output_tar = io.BytesIO()
         #### HDD ####
-        runOptBioDes_hdd(inputTar,
-                         outputTar,
+        runOptBioDes_hdd(input_tar,
+                         input_sbol,
+                         output_tar,
                          str(params['pathway_id']),
-                         int(params['maxVariants']),
-                         int(params['libSize']),
-                         str(params['inputParts']))
+                         int(params['max_variants']),
+                         int(params['lib_size']),
+                         str(params['input_parts']))
         ###### IMPORTANT ######
-        outputTar.seek(0)
+        output_tar.seek(0)
         #######################
-        return send_file(outputTar, as_attachment=True, attachment_filename='rpOptBioDes.tar', mimetype='application/x-tar')
+        return send_file(output_tar, as_attachment=True, attachment_filename='rpOptBioDes.tar', mimetype='application/x-tar')
 
 
 api.add_resource(RestApp, '/REST')
