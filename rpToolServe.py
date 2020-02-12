@@ -20,7 +20,8 @@ import rpTool
 ## run using HDD 3X less than the above function
 #
 #
-def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, libSize=32, inputParts=None):
+#def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, libSize=32, inputParts=None):
+def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', maxgenes=5, libSize=32, inputParts=None):
     """ - libSize: desired size of the combinatorial library,
         - maxgenes: maximum number of genes selected per step
         - inputParts: file with a URI list of sbol parts in Synbiohub
@@ -35,7 +36,7 @@ def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, l
                 tar.extractall(path=tmpInputFolder)
                 tar.close()
                 for sbml_path in glob.glob(tmpInputFolder+'/*'):
-                    fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '')
+                    fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '').replace('.rpsbml', '')
                     selenzyme_info = rpTool.readRPpathway_selenzyme(libsbml.readSBMLFromFile(sbml_path), pathway_id)
                     ##### PABLO ####
                     # Prepare input files: geneparts.csv, refparts.csv
@@ -48,7 +49,8 @@ def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, l
                         refs.to_csv(ref_parts,index=False)
                     # Run DoE and retrieve SBOL and diagnostics
                     try:
-                        diagnostics = rpTool.doeGetSBOL(ref_parts, gene_parts, libSize)
+                        #diagnostics = rpTool.doeGetSBOL(ref_parts, gene_parts, libSize)
+                        diagnostics = rpTool.doeGetSBOL(pfile=ref_parts, gfile=gene_parts, libsize=libsize, gsbol=inputSbol)
                     except:
                         logging.error('Error detected error in rpTool.doeGetSBOL for '+str(sbml_path))
                         continue
