@@ -6,7 +6,7 @@ RUN pip install pandas numpy scipy sklearn pysbol python-libsbml flask flask_res
 
 WORKDIR home
 
-RUN git clone https://github.com/pablocarb/doebase.git
+RUN git clone –branch v1.2 https://github.com/pablocarb/doebase.git
 
 COPY rpTool.py /home/
 COPY rpToolServe.py /home/

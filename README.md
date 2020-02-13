@@ -33,7 +33,7 @@ Build the docker image:
 
 ```
 docker build -t brsynth/rpoptbiodes-rest .
-docker run -p 8880:8888 brsynth/rpoptbiodes-rest
+docker run -p 8880:8888 brsynth/rpoptbiodes-rest:dev
 ```
 
 Make sure that the following entry exists under Galaxy's destination tag in job_conf.xml:
