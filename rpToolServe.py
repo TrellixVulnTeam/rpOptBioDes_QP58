@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 sys.path.insert(0, '/home/')
 
@@ -14,7 +16,7 @@ import rpTool
 ## run using HDD 3X less than the above function
 #
 #
-def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, libsize=32, file_parts=None):
+def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', maxgenes=5, libsize=32, file_parts=None):
     """ - libsize: desired size of the combinatorial library,
         - maxgenes: maximum number of genes selected per step
         - file_parts: file with a URI list of sbol parts in Synbiohub
@@ -42,7 +44,7 @@ def runOptBioDes_hdd(inputTar, outputTar, pathway_id='rp_pathway', maxgenes=5, l
                         refs.to_csv(ref_parts,index=False)
                     # Run DoE and retrieve SBOL and diagnostics
                     try:
-                        diagnostics = rpTool.doeGetSBOL(ref_parts, gene_parts, libsize)
+                       diagnostics = rpTool.doeGetSBOL(pfile=ref_parts, gfile=gene_parts, libsize=libsize, gsbol=inputSbol)
                     except:
                         logging.error('Error detected error in rpTool.doeGetSBOL for '+str(sbml_path))
                         continue

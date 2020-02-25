@@ -1,9 +1,8 @@
-import sys
-sys.path.insert(0, '/home/')
-
 import re
 import csv
 import pandas as pd
+import libsbml
+import logging
 from doebase.synbioParts import doeGetSBOL
 
 
@@ -72,6 +71,7 @@ def refparts_default():
         ['BBR1','origin','https://synbiohub.org/public/igem/BBa_I50041/1'],
         ['p15A','origin','https://synbiohub.org/public/igem/BBa_I50032/1'],
         ['ColE1','origin','https://synbiohub.org/public/igem/BBa_J64101/1'],
-        ['res1','resistance','https://synbiohub.org/public/igem/BBa_I13800/1']
+        ['res1','resistance','https://synbiohub.org/public/igem/BBa_I13800/1'],
+        ['Ter','terminator','https://synbiohub.org/public/igem/BBa_B1006/1']
     ], columns=['Name','Type','Part'])
     return refs
