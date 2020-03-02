@@ -31,7 +31,7 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                 tar.extractall(path=tmpInputFolder)
                 tar.close()
                 for sbml_path in glob.glob(tmpInputFolder+'/*'):
-                    fileName = sbml_path.split('/')[-1].replace('.sbml', '').replace('.xml', '')
+                    fileName = sbml_path.split('/')[-1].replace('rpsbml', '').replace('.sbml', '').replace('.xml', '')
                     selenzyme_info = rpTool.readRPpathway_selenzyme(libsbml.readSBMLFromFile(sbml_path), pathway_id)
                     ##### PABLO ####
                     # Prepare input files: geneparts.csv, refparts.csv
@@ -74,7 +74,7 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                     ################
                 with tarfile.open(outputTar, mode='w:xz') as ot:
                     for sbol_path in glob.glob(tmpOutputFolder+'/*'):
-                        fileName = sbol_path.split('/')[-1].replace('.sbml','').replace('.xml','').replace('.sbol','')
+                        fileName = sbol_path.split('/')[-1].replace('rpsbml', '').replace('.sbml','').replace('.xml','').replace('.sbol','')
                         outFileName = fileName+'.sbol.xml'
                         info = tarfile.TarInfo(outFileName)
                         info.size = os.path.getsize(sbol_path)
