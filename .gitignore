@@ -1,4 +1,3 @@
 __pycache__/
 doebase/
-test/results/
-test/test_output.tar
+test/
