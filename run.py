@@ -26,7 +26,7 @@ def main(inputfile,
          lib_size,
          input_parts)
     docker_client = docker.from_env()
-    image_str = 'brsynth/rpoptbiodes-standalone:dev'
+    image_str = 'brsynth/rpoptbiodes-standalone'
     try:
         image = docker_client.images.get(image_str)
     except docker.errors.ImageNotFound:
