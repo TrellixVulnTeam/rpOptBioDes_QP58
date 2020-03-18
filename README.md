@@ -23,6 +23,10 @@ Advanced options:
 
 * **output**: (string) Path to the output SBOL file
 
+## Dependencies
+
+* Base Docker Image: [python:3.6](https://hub.docker.com/_/python)
+
 ## Installing
 
 To build the image using the Dockerfile, use the following command:
@@ -38,10 +42,6 @@ To run the test, untar the test.tar.xz file and run the following command:
 ```
 python run,py -input test/test_rpGlobalScore.tar -input_format tar -input_sbol test/test.sbol -output test/test_output.tar
 ```
-
-## Prerequisites
-
-* Base Docker Image: [python:3.6](https://hub.docker.com/_/python)
 
 ## Contributing
 
