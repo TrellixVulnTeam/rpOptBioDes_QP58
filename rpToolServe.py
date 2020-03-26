@@ -10,6 +10,7 @@ import libsbml
 import os
 
 import rpTool
+from viscad.viscad import createnewCad
 
 ## run using HDD 3X less than the above function
 #
@@ -42,7 +43,10 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                         refs.to_csv(ref_parts,index=False)
                     # Run DoE and retrieve SBOL and diagnostics
                     try:
-                       diagnostics = rpTool.doeGetSBOL(pfile=ref_parts, gfile=gene_parts, libsize=libsize, gsbol=inputSbol)
+                        diagnostics = rpTool.doeGetSBOL(pfile=ref_parts, gfile=gene_parts, libsize=libsize, gsbol=inputSbol)
+                        M = diagnostics['M']
+                        outsvg = os.path.join(tmpOutputFolder, fileName+'.svg')
+                        createnewCad(M=M,outfile=outsvg,colvariants=True)
                     except:
                         logging.error('Error detected error in rpTool.doeGetSBOL for '+str(sbml_path))
                         continue
@@ -72,8 +76,11 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                     ################
                 with tarfile.open(outputTar, mode='w:xz') as ot:
                     for sbol_path in glob.glob(tmpOutputFolder+'/*'):
-                        fileName = sbol_path.split('/')[-1].replace('.sbml','').replace('.xml','').replace('.sbol','')
-                        outFileName = fileName+'.sbol.xml'
+                        if not sbol_path.endswith('.svg'):
+                            fileName = sbol_path.split('/')[-1].replace('.sbml','').replace('.xml','').replace('.sbol','')
+                            outFileName = fileName+'.sbol.xml'
+                        else:
+                            outFileName = sbol_path.split('/')[-1]
                         info = tarfile.TarInfo(outFileName)
                         info.size = os.path.getsize(sbol_path)
                         ot.addfile(tarinfo=info, fileobj=open(sbol_path, 'rb')) 
