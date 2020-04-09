@@ -30,6 +30,9 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                 tar = tarfile.open(inputTar, mode='r')
                 tar.extractall(path=tmpInputFolder)
                 tar.close()
+                if len(glob.glob(tmpInputFolder+'/*'))==0:
+                    logging.error('Input file is empty')
+                    return False
                 for sbml_path in glob.glob(tmpInputFolder+'/*'):
                     fileName = sbml_path.split('/')[-1].replace('rpsbml', '').replace('.sbml', '').replace('.xml', '')
                     selenzyme_info = rpTool.readRPpathway_selenzyme(libsbml.readSBMLFromFile(sbml_path), pathway_id)
@@ -72,6 +75,9 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                     #NOTE: this is retro so the first reaction is RP{highest} and the last reaction in the pathway is RP{lowest}
                     # the dictionnary should be like the following:
                     ################
+                if len(glob.glob(tmpOutputFolder+'/*'))==0:
+                    logging.error('rpOptBioDes has not returned any results')
+                    return False
                 with tarfile.open(outputTar, mode='w:xz') as ot:
                     for sbol_path in glob.glob(tmpOutputFolder+'/*'):
                         fileName = sbol_path.split('/')[-1].replace('rpsbml', '').replace('.sbml','').replace('.xml','').replace('.sbol','')
@@ -83,3 +89,4 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                         info = tarfile.TarInfo(parts_path.split('/')[-1])
                         info.size = os.path.getsize(parts_path)
                         ot.addfile(tarinfo=info, fileobj=open(parts_path, 'rb')) 
+    return True
