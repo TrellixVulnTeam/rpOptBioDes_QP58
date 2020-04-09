@@ -78,7 +78,7 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                 if len(glob.glob(tmpOutputFolder+'/*'))==0:
                     logging.error('rpOptBioDes has not returned any results')
                     return False
-                with tarfile.open(outputTar, mode='w:xz') as ot:
+                with tarfile.open(outputTar, mode='w:gz') as ot:
                     for sbol_path in glob.glob(tmpOutputFolder+'/*'):
                         fileName = sbol_path.split('/')[-1].replace('rpsbml', '').replace('.sbml','').replace('.xml','').replace('.sbol','')
                         outFileName = fileName+'.sbol.xml'
