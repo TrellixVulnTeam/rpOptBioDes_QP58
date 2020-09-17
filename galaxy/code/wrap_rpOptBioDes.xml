@@ -1,7 +1,7 @@
 <tool id="rpOptBioDes" name="OptDoE" version="0.1">
   <description>From SBML pathways and their SBOL, add the promoters, terminators and perform design of experiment</description>
   <requirements>
-		<container type="docker">brsynth/rpoptbiodes-standalone:dev</container>
+		<container type="docker">brsynth/rpoptbiodes-standalone</container>
   </requirements>
   <stdio>
 		<regex match="WARNING:" level="warning" />
