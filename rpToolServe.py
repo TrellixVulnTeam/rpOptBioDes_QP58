@@ -45,6 +45,8 @@ def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', ma
                         refs = rpTool.refparts_default()
                         ref_parts = os.path.join(tmpPartsFolder, 'RefParts.csv')
                         refs.to_csv(ref_parts,index=False)
+                    else:
+                        ref_parts = file_parts
                     # Run DoE and retrieve SBOL and diagnostics
                     try:
                        diagnostics = rpTool.doeGetSBOL(pfile=ref_parts, gfile=gene_parts, libsize=libsize, gsbol=inputSbol)

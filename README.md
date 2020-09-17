@@ -32,7 +32,7 @@ Advanced options:
 To build the image using the Dockerfile, use the following command:
 
 ```
-docker build -t brsynth/rpoptbiodes-standalone: .
+docker build -t brsynth/rpoptbiodes-standalone:dev .
 ```
 
 ### Running the tests
