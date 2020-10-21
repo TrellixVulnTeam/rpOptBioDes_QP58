@@ -7,13 +7,18 @@ from doebase.synbioParts import doeGetSBOL
 
 
 #TODO: consider replacing this function with directly rpSBML functions from an import 
-
-#TODO: consider replacing this function with directly rpSBML functions from an import 
-
-## Function that reads returns the list of rea
-#
-#
 def readRPpathway_selenzyme(sbml, pathway_id='rp_pathway'):
+    """Function that reads rpSBML files and returns selenzyme information
+
+    :param sbml: The libsbml object
+    :param pathway_id: The Groups id of the heterologous pathway
+
+    :type sbml: libsbml.model
+    :type pathway_id: str
+
+    :rtype: dict
+    :return: The rpSelenzume information
+    """
     # loop through all the members of RP heterologous reactions
     groups = sbml.model.getPlugin('groups')
     rp_pathway = groups.getGroup(pathway_id)
@@ -44,8 +49,18 @@ def readRPpathway_selenzyme(sbml, pathway_id='rp_pathway'):
 
 
 def selenzinfo2table(si, maxgenes=5):
-    """ Convert the selenzyme_info dictionary into the input table: Name, Type, Part, Step
-        It assumes that pathway steps are in reverse direction and are called as RP1, RP2, etc.
+    """Convert the selenzyme_info dictionary into the input table: Name, Type, Part, Step
+
+    It assumes that pathway steps are in reverse direction and are called as RP1, RP2, etc.
+
+    :param si: The selenzyme information of the heterologous pathway
+    :param maxgenes: The maximal number of genes
+
+    :type si: dict
+    :type maxgenes: int
+
+    :rtype: pandas.DataFrame
+    :return: The table of parts
     """
     genes = pd.DataFrame(columns=['Name','Type', 'Part', 'Step'])
     s = 1
@@ -63,7 +78,10 @@ def selenzinfo2table(si, maxgenes=5):
 
 
 def refparts_default():
-    """ Default set of gene regulatory parts in E. coli
+    """Default set of gene regulatory parts in E. coli
+
+    :rtype: pandas.DataFrame
+    :return: The table of default promoter, terminators, etc... parts
     """
     refs = pd.DataFrame([
         ['PlacUV5','promoter','https://synbiohub.org/public/igem/BBa_K1847014/1'],

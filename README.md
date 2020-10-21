@@ -40,7 +40,7 @@ docker build -t brsynth/rpoptbiodes-standalone .
 To run the test, untar the test.tar.xz file and run the following command:
 
 ```
-python run,py -input test/test_rpGlobalScore.tar -input_format tar -input_sbol test/test.sbol -output test/test_output.tar
+python run.py -input test/test_rpGlobalScore.tar -input_format tar -input_sbol test/test.sbol -output test/test_output.tar
 ```
 
 ## Contributing

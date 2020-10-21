@@ -13,13 +13,27 @@ import os
 
 import rpTool
 
-## run using HDD 3X less than the above function
-#
-#
 def runOptBioDes_hdd(inputTar, inputSbol, outputTar, pathway_id='rp_pathway', maxgenes=5, libsize=32, file_parts=None):
-    """ - libsize: desired size of the combinatorial library,
-        - maxgenes: maximum number of genes selected per step
-        - file_parts: file with a URI list of sbol parts in Synbiohub
+    """Calculate the design of experiment combination of genetic parts
+
+    :param inputTar: The path to the input TAR collection of rpSBML
+    :param inputSbol: The path to the input SBOL file
+    :param outputTar: The path to the output TAR collection of rpSOL
+    :param pathway_id: The Groups id of the heterologous pathway (Default: rp_pathway)
+    :param maxgenes: Maximum number of genes selected per step (Default: 5)
+    :param libsize: Desired size of the combinatorial library (Default: 32)
+    :param file_parts: The file with a URI list of sbol parts in Synbiohub (Default: None)
+
+    :type inputTar: str
+    :type inputSbol: str
+    :type outputTar: str
+    :type pathway_id: str
+    :type maxgenes: int
+    :type libsize: int 
+    :type file_parts: str
+
+    :rtype: bool
+    :return: The success or failure of the function
     """
     if file_parts=='None' or file_parts=='none' or file_parts=='N':
         file_parts = None
